@@ -369,3 +369,5 @@ footer { border-top: 1px solid var(--line); padding: 32px 5vw; }
 .founding-team{align-self:start;border:1px solid var(--line);background:#0d1527;border-radius:16px;padding:20px}.founding-team h3{font-size:17px;margin:9px 0 16px}.founding-person{display:flex;flex-direction:column;gap:4px;padding:12px 0;border-top:1px solid var(--line)}.founding-person b{font-size:12px}.founding-person span{font-size:11px;color:#a99eff}.founding-person small{font-size:10px;color:#8290ab;overflow-wrap:anywhere}
 @media(max-width:900px){.form-four-col{grid-template-columns:repeat(2,minmax(0,1fr))}.club-profile-details{grid-template-columns:1fr}}
 @media(max-width:620px){.form-four-col{grid-template-columns:1fr}.club-profile-details{padding:20px}}
+/* Nhãn trạng thái trên thẻ sự kiện */
+.event-status-tag { position: absolute; top: 15px; right: 15px; z-index: 1; backdrop-filter: blur(6px); background-color: #0c1224cc; }

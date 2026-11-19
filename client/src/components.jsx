@@ -1,12 +1,16 @@
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, CalendarDays, MapPin, Users } from 'lucide-react';
+import { getEventAvailability } from './utils/eventHelpers';
 
 export function EventCard({ event }) {
   const date = event.startAt ? new Date(event.startAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Chưa xác định';
+  const availability = getEventAvailability(event);
   return (
     <article className="event-card">
       <div className="event-cover" style={event.cover ? { backgroundImage: `linear-gradient(180deg,#10172a10,#10172a66),url(${event.cover})` } : undefined}>
-        <span className="tag">{event.category || 'Community'}</span><span className="cover-symbol">✦</span>
+        <span className="tag">{event.category || 'Community'}</span>
+        {availability && <span className={`status-pill ${availability.tone} event-status-tag`}>{availability.label}</span>}
+        <span className="cover-symbol">✦</span>
       </div>
       <div className="event-body">
         <div className="event-meta"><span><CalendarDays size={14}/>{date}</span><span><MapPin size={14}/>{event.location || 'Online'}</span></div>
