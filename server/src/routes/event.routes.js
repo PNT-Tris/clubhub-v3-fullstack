@@ -37,9 +37,20 @@ router.get('/', async (req, res, next) => {
       { location: { $regex: escapeRegex(req.query.search), $options: 'i' } }
     ];
     if (req.query.upcoming === 'true') filter.startAt = { $gte: new Date() };
+    const page = Math.max(Number(req.query.page) || 1, 1);
     const limit = Math.min(Math.max(Number(req.query.limit) || 100, 1), 100);
-    const events = await Event.find(filter).populate('club', 'name').sort({ startAt: 1 }).limit(limit);
-    res.json({ events });
+    const [events, total] = await Promise.all([
+      Event.find(filter).populate('club', 'name').sort({ startAt: 1 }).skip((page - 1) * limit).limit(limit),
+      Event.countDocuments(filter)
+    ]);
+    res.json({ events, pagination: { page, limit, total, pages: Math.ceil(total / limit) } });
+  } catch (error) { next(error); }
+});
+
+router.get('/categories', async (req, res, next) => {
+  try {
+    const categories = await Event.distinct('category', { status: 'published' });
+    res.json({ categories: categories.filter(Boolean).sort((a, b) => a.localeCompare(b, 'vi')) });
   } catch (error) { next(error); }
 });
 

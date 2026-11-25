@@ -118,10 +118,12 @@ router.post('/register', async (req, res, next) => {
 
 router.post('/login', async (req, res, next) => {
   try {
-    const email = String(req.body.email || '').trim().toLowerCase();
+    const identifier = String(req.body.identifier || req.body.email || '').trim();
     const password = String(req.body.password || '');
-    const user = await User.findOne({ email }).select('+password');
-    if (!user || !user.password || !(await bcrypt.compare(password, user.password))) return res.status(401).json({ message: 'Email hoặc mật khẩu không chính xác.' });
+    const normalizedPhone = normalizePhone(identifier);
+    const query = validPhone(normalizedPhone) ? { phone: normalizedPhone } : { email: identifier.toLowerCase() };
+    const user = await User.findOne(query).select('+password');
+    if (!user || !user.password || !(await bcrypt.compare(password, user.password))) return res.status(401).json({ message: 'Email/số điện thoại hoặc mật khẩu không chính xác.' });
     res.json(sessionResponse(user));
   } catch (error) { next(error); }
 });
@@ -172,8 +174,10 @@ router.post('/phone/verify-otp', otpLimiter, async (req, res, next) => {
     const phone = normalizePhone(req.body.phone);
     const code = String(req.body.code || '').trim();
     const name = String(req.body.name || '').trim();
+    const password = String(req.body.password || '');
     const intent = req.body.intent === 'register' ? 'register' : 'login';
     if (!validPhone(phone) || !/^\d{4,10}$/.test(code)) return res.status(400).json({ message: 'Số điện thoại hoặc mã OTP không hợp lệ.' });
+    if (password && password.length < 8) return res.status(400).json({ message: 'Mật khẩu phải có ít nhất 8 ký tự.' });
     let user = await User.findOne({ phone });
     if (intent === 'login' && !user) return res.status(404).json({ message: 'Số điện thoại chưa có tài khoản. Hãy chuyển sang tab Đăng ký.' });
     if (intent === 'register' && user) return res.status(409).json({ message: 'Số điện thoại đã có tài khoản. Hãy chuyển sang tab Đăng nhập.' });
@@ -182,7 +186,12 @@ router.post('/phone/verify-otp', otpLimiter, async (req, res, next) => {
     if (!user) {
       const safeName = name.length >= 2 ? name.slice(0, 80) : `Thành viên ${phone.slice(-4)}`;
       const internalEmail = `phone.${phone.replace(/\D/g, '')}@phone.clubhub.invalid`;
-      user = await User.create({ name: safeName, email: internalEmail, phone, authProviders: ['phone'] });
+      const userData = { name: safeName, email: internalEmail, phone, authProviders: ['phone'] };
+      if (intent === 'register' && password) {
+        userData.password = await bcrypt.hash(password, 12);
+        userData.authProviders.push('password');
+      }
+      user = await User.create(userData);
     } else {
       user.authProviders = [...new Set([...(user.authProviders || []), 'phone'])];
       await user.save();

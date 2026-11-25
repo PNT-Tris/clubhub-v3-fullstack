@@ -8,6 +8,13 @@ import { protect, adminOnly, clubManagerOnly, clubOwnerOnly } from '../middlewar
 const router = Router();
 const escapeRegex = (value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+router.get('/categories', async (req, res, next) => {
+  try {
+    const categories = await Club.distinct('category', { isActive: true });
+    res.json({ categories: categories.filter(Boolean).sort((a, b) => a.localeCompare(b, 'vi')) });
+  } catch (error) { next(error); }
+});
+
 // Lấy danh sách CLB; hỗ trợ tìm kiếm, lọc danh mục và phân trang.
 router.get('/', async (req, res, next) => {
   try {

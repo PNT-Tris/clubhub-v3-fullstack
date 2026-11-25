@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, CalendarDays, MapPin, Users } from 'lucide-react';
+import { ArrowUpRight, CalendarDays, ChevronLeft, ChevronRight, MapPin, Users } from 'lucide-react';
 
 export function EventCard({ event }) {
   const date = event.startAt ? new Date(event.startAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : 'Chưa xác định';
@@ -25,3 +25,11 @@ export function Loading({ text = 'Đang tải dữ liệu...' }) { return <div c
 export function Empty({ text = 'Chưa có dữ liệu phù hợp', desc = 'Hãy thử thay đổi bộ lọc hoặc quay lại sau nhé.' }) { return <div className="empty"><div>✦</div><h3>{text}</h3><p>{desc}</p></div>; }
 export function ErrorMessage({ children }) { return children ? <div className="notice error" role="alert">{children}</div> : null; }
 export function SuccessMessage({ children }) { return children ? <div className="notice" role="status">{children}</div> : null; }
+export function Pagination({ page, pages, onPageChange }) {
+  if (pages <= 1) return null;
+  return <nav className="pagination" aria-label="Phân trang">
+    <button className="btn btn-ghost" type="button" onClick={() => onPageChange(page - 1)} disabled={page <= 1}><ChevronLeft size={16}/> Trang trước</button>
+    <span aria-live="polite">Trang {page} / {pages}</span>
+    <button className="btn btn-ghost" type="button" onClick={() => onPageChange(page + 1)} disabled={page >= pages}>Trang sau <ChevronRight size={16}/></button>
+  </nav>;
+}

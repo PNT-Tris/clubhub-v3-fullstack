@@ -19,7 +19,7 @@ import { Loading } from './components';
 function ProtectedHint() { return <div className="container page"><div className="empty"><h2>Bạn cần đăng nhập</h2><p>Đăng nhập để xem nội dung cá nhân.</p><Link className="btn btn-primary" to="/auth">Đăng nhập</Link></div></div>; }
 
 export default function App() {
-  const { user, logout, isReady } = useAuth();
+  const { user, logout, isReady, sessionError, retrySession } = useAuth();
   const [menu, setMenu] = useState(false);
   const navigate = useNavigate();
   function signOut() { logout(); setMenu(false); navigate('/'); }
@@ -41,7 +41,7 @@ export default function App() {
       </nav>
       <div className="top-actions">{user ? <><span className="user-chip">Xin chào, {user.name}</span><button className="icon-btn" title="Đăng xuất" onClick={signOut}><LogOut size={18}/></button></> : <Link className="btn btn-small" to="/auth"><LogIn size={16}/> Đăng nhập</Link>}</div>
     </header>
-    <main><Routes>
+    <main>{sessionError && <div className="container"><div className="notice error" role="alert">{sessionError} <button className="btn btn-small" type="button" onClick={retrySession}>Thử lại</button></div></div>}<Routes>
       <Route path="/" element={<Home/>}/><Route path="/events" element={<Events/>}/><Route path="/events/:id" element={<EventDetail/>}/>
       <Route path="/clubs" element={<Clubs/>}/><Route path="/clubs/:id" element={<ClubDetail/>}/>
       <Route path="/club-applications/new" element={<ClubApplicationForm/>}/><Route path="/my-club-applications" element={<MyClubApplications/>}/>

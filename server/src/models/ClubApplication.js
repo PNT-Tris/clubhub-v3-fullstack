@@ -8,7 +8,7 @@ const founderSchema = new mongoose.Schema({
 }, { _id: false });
 
 const clubApplicationSchema = new mongoose.Schema({
-  applicant: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  applicant: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   proposedName: { type: String, required: true, trim: true, minlength: 3, maxlength: 100 },
   category: { type: String, required: true, trim: true, maxlength: 60 },
   description: { type: String, required: true, trim: true, minlength: 100, maxlength: 2000 },
@@ -33,7 +33,10 @@ const clubApplicationSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 clubApplicationSchema.index({ applicant: 1, status: 1 });
-clubApplicationSchema.index({ applicant: 1 }, { unique: true, partialFilterExpression: { status: 'pending' } });
+clubApplicationSchema.index(
+  { applicant: 1 },
+  { name: 'pending_application_per_applicant', unique: true, partialFilterExpression: { status: 'pending' } }
+);
 clubApplicationSchema.index({ proposedName: 1, status: 1 });
 
 export default mongoose.model('ClubApplication', clubApplicationSchema);

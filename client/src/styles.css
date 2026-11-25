@@ -97,6 +97,9 @@ button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible
 .join-caption { position: absolute; bottom: 0; right: 0; font-size: 9px; letter-spacing: 3px; line-height: 1.7; color: #a8b0cb; }
 
 .filter-bar { display: flex; gap: 12px; margin-bottom: 25px; }
+.pagination { display: flex; align-items: center; justify-content: center; gap: 16px; margin-top: 30px; color: var(--muted); font-size: 11px; }
+.pagination .btn { padding: 9px 13px; }
+.pagination .btn:disabled { transform: none; }
 .search-box, .category-filter { display: flex; align-items: center; gap: 10px; background: #121a2e; border: 1px solid var(--line); border-radius: 12px; padding: 0 14px; color: #929db8; }
 .search-box { flex: 1; }
 .search-box input { width: 100%; padding: 14px 0; background: transparent; border: 0; outline: 0; color: #fff; font-size: 11px; }
@@ -260,6 +263,8 @@ footer { border-top: 1px solid var(--line); padding: 32px 5vw; }
   .join-visual { align-self: center; margin-top: 15px; }
   .page-heading h1 { font-size: 35px; }
   .filter-bar { flex-direction: column; }
+  .pagination { gap: 8px; }
+  .pagination .btn { padding: 8px; font-size: 10px; }
   .club-detail-hero { padding: 24px; }
   .club-detail-head { flex-direction: column; gap: 10px; }
   .club-detail-hero h1 { font-size: 31px; }
@@ -301,10 +306,18 @@ footer { border-top: 1px solid var(--line); padding: 32px 5vw; }
 .password-toggle { position: absolute; right: 7px; top: 50%; transform: translateY(-50%); border: 0; color: #aab4ca; background: transparent; cursor: pointer; display: grid; place-items: center; width: 34px; height: 34px; }
 .auth-divider { display: flex; align-items: center; gap: 12px; margin: 23px 0 15px; color: #74809d; font-size: 10px; }
 .auth-divider::before, .auth-divider::after { content: ''; height: 1px; background: var(--line); flex: 1; }
-.social-login-area { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; align-items: center; }
-.google-login-button { min-height: 42px; display: flex; justify-content: center; overflow: hidden; }
-.social-login-button { min-height: 42px; border: 1px solid #ffffff24; border-radius: 7px; background: #202b42; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 11px; cursor: pointer; }
-.facebook-login { background: #213c68; }
+.social-login-area { display: grid; grid-template-columns: 1fr; gap: 9px; align-items: center; }
+.google-login-button { height: 44px; display: flex; justify-content: center; overflow: hidden; position: relative; width: 100%; }
+.google-login-button > div { width: 100% !important; }
+.google-login-button iframe { width: 100% !important; }
+.google-login-label { position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; justify-content: center; gap: 11px; border: 1px solid #dadce0; border-radius: 4px; background: #fff; color: #3c4043; font-family: Arial, sans-serif; font-size: 14px; font-weight: 500; line-height: 44px; pointer-events: none; }
+.google-login-label svg { width: 20px; height: 20px; flex: 0 0 auto; }
+.social-login-button { height: 44px; border: 1px solid #dadce0; border-radius: 4px; background: #fff; color: #3c4043; display: flex; align-items: center; justify-content: center; gap: 11px; font-family: Arial, sans-serif; font-size: 14px; font-weight: 500; line-height: 44px; cursor: pointer; }
+.social-login-button svg { width: 20px; height: 20px; flex: 0 0 auto; }
+.social-login-button:disabled { cursor: default; opacity: .72; }
+@media (max-width: 520px) {
+  .social-login-area { grid-template-columns: 1fr; }
+}
 .auth-config-hint { color: #73809d; font-size: 9px; line-height: 1.6; margin: 12px 0 0; }
 .auth-security-note { color: #9ba6c0; font-size: 10px; line-height: 1.8; padding: 13px 15px; border: 1px solid #ffffff14; border-radius: 12px; background: #ffffff06; margin-top: 28px; }
 .resend-otp { border: 0; background: transparent; margin-top: 13px; cursor: pointer; }

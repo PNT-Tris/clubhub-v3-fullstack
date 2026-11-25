@@ -2,9 +2,9 @@
 
 Trang `/auth` đã có ba nhóm phương thức:
 
-1. **Email + mật khẩu**: đăng ký/đăng nhập với mật khẩu hash bằng bcrypt. Nút con mắt chuyển trường mật khẩu giữa `password` và `text`.
+1. **Email hoặc số điện thoại + mật khẩu**: dùng cùng một ô đăng nhập; số điện thoại khi đăng ký phải xác minh bằng OTP SMS, sau đó có thể đăng nhập bằng mật khẩu.
 2. **Google và Facebook**: đăng nhập/đăng ký bằng tài khoản bên thứ ba. Backend xác minh token với nhà cung cấp trước khi cấp JWT ClubHub.
-3. **Số điện thoại**: đăng ký/đăng nhập bằng OTP SMS qua Twilio Verify. Không lưu mã OTP trong MongoDB và không cho đăng nhập chỉ bằng số điện thoại chưa xác minh.
+3. **OTP số điện thoại**: có thể chọn đăng nhập bằng mã SMS qua Twilio Verify thay cho mật khẩu. Không lưu mã OTP trong MongoDB và không cho đăng nhập chỉ bằng số điện thoại chưa xác minh.
 
 Các tính năng này cần tài khoản nhà cung cấp và thông tin cấu hình của người triển khai. Source code không thể tự tạo Client ID, App Secret hay gửi SMS miễn phí.
 
@@ -24,7 +24,7 @@ Không commit hai file `.env`. Chỉ commit `.env.example`. Mọi secret phải 
 1. Mở [Google Cloud Console](https://console.cloud.google.com/).
 2. Tạo hoặc chọn một Google Cloud project.
 3. Thiết lập OAuth consent screen/Google Auth Platform branding và tạo OAuth Client ID loại **Web application**.
-4. Ở **Authorized JavaScript origins**, thêm `http://localhost:5173` khi phát triển. Khi deploy, thêm origin HTTPS chính thức của website.
+4. Ở **Authorized JavaScript origins**, thêm `http://localhost:5173` và `http://127.0.0.1:5173` khi phát triển (phải khớp chính xác địa chỉ đang mở trên trình duyệt). Khi deploy, thêm origin HTTPS chính thức của website.
 5. Sao chép Client ID (chuỗi kết thúc bằng `.apps.googleusercontent.com`).
 6. Đặt cùng một giá trị vào cả hai file:
 
@@ -91,7 +91,7 @@ TWILIO_VERIFY_SERVICE_SID=VAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 5. Không đặt bất kỳ Twilio secret nào trong `client/.env`.
 6. Nhập số điện thoại theo định dạng E.164, ví dụ `+84901234567`.
-7. Thử đăng ký số chưa tồn tại, nhận SMS và nhập OTP. Sau khi tài khoản được tạo, chuyển sang đăng nhập và gửi OTP lần tiếp theo.
+7. Khi đăng ký bằng số chưa tồn tại, nhập tên và mật khẩu, nhận SMS rồi nhập OTP để tạo tài khoản đã xác minh. Sau đó có thể đăng nhập bằng số điện thoại và mật khẩu, hoặc chọn đăng nhập qua OTP.
 
 Twilio Verify dùng hai bước: tạo Verification để gửi mã và Verification Check để xác minh mã. Với tài khoản Trial, Twilio có thể yêu cầu xác minh trước số điện thoại nhận tin; giới hạn và khả năng gửi SMS còn phụ thuộc quốc gia, nhà mạng và cấu hình/tài khoản Twilio.
 
@@ -115,12 +115,12 @@ Một provider không thể liên kết đồng thời vào hai tài khoản Clu
 |---|---|---|
 | Google · Chưa cấu hình | Thiếu `VITE_GOOGLE_CLIENT_ID` | Thêm Client ID vào `client/.env` |
 | Google API trả 503 | Thiếu `GOOGLE_CLIENT_ID` ở server | Thêm cùng Client ID vào `server/.env` |
-| Google origin/unauthorized domain | Origin chưa đăng ký | Thêm đúng `http://localhost:5173` hoặc domain HTTPS |
+| Google origin/unauthorized domain | Origin chưa đăng ký | Thêm đúng `http://localhost:5173`, `http://127.0.0.1:5173` hoặc domain HTTPS |
 | Facebook · Chưa cấu hình | Thiếu App ID | Thêm App ID ở cả client và server |
 | Facebook token invalid | App Secret/App ID sai, token hết hạn hoặc app không đúng | Kiểm tra Meta App settings và khởi động lại |
 | SMS chưa được cấu hình (503) | Thiếu một trong ba biến Twilio | Kiểm tra SID, Auth Token, Verify Service SID |
 | OTP không gửi được | Trial account, quốc gia/nhà mạng, fraud control hoặc billing chưa phù hợp | Xem trạng thái Verify Service và log Twilio |
-| `CORS` error | `CLIENT_URL` không trùng origin frontend | Đặt `CLIENT_URL=http://localhost:5173` (hoặc domain deploy) |
+| `CORS` error | `CLIENT_URL` không trùng origin frontend | Đặt `CLIENT_URL=http://localhost:5173,http://127.0.0.1:5173` (hoặc domain deploy) |
 
 Sau khi chỉnh bất kỳ `.env` nào, hãy dừng và chạy lại cả hai server. Vite không tự nạp lại biến môi trường nếu chỉ sửa file trong lúc đang chạy.
 
